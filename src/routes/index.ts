@@ -1,14 +1,11 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import { postCreate, listPost, postEdit } from '../controllers/post.controller';
 
 const router = Router();
 
-router.get('/', (req: Request, res: Response) => {
-  const data = {
-    message: 'Hello depuis ton API en TypeScript !',
-    version: '1.0.0',
-  };
 
-  res.json(data);
-});
+router.post('/new', postCreate);
+router.patch('/edit/:id', postEdit)
+router.get('/posts', listPost);
 
 export default router;
