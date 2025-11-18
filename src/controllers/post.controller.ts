@@ -1,6 +1,42 @@
 import { Request, Response, NextFunction } from 'express';
 import Post from '../models/post.model';
 import { IPostRequest } from '../types/post.types';
+import { ObjectId } from 'mongoose';
+
+export const postDelete = async (
+  req: Request<{ id: ObjectId}, {}, IPostRequest>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const deletePost = await Post.findByIdAndDelete(id);
+
+    if (!deletePost) {
+      res.status(404).json({
+        success: false,
+        message: "Post non trouvé."
+      });
+      return;
+    }
+
+    res.status(201).json({
+      success: true
+    });
+  } catch (err: any) {
+    if (err.name === 'ValidationError') {
+      const errors = Object.keys(err.errors).map(
+        (key) => err.errors[key].message
+      );
+      res.status(400).json({
+        success: false,
+        errors,
+      });
+    } else {
+      next(err);
+    }
+  };
+};
 
 export const postEdit = async (
   req: Request<{ id: string }, {}, IPostRequest>,
@@ -44,7 +80,7 @@ export const postEdit = async (
     } else {
       next(err);
     }
-  }
+  };
 };
 
 export const postCreate = async (
@@ -54,6 +90,13 @@ export const postCreate = async (
 ): Promise<void> => {
   try {
     const { body } = req;
+    const posts = await Post.find({ title: body.title }).exec();
+
+    if (posts) {
+      body.slug = body.title + posts.length;
+    } else {
+      body.slug = body.title;
+    }
     const post = new Post(body);
     const savedPost = await post.save();
 
@@ -62,6 +105,7 @@ export const postCreate = async (
       data: savedPost,
     });
   } catch (err: any) {
+    console.log(err)
     if (err.name === 'ValidationError') {
       const errors = Object.keys(err.errors).map(
         (key) => err.errors[key].message
@@ -73,7 +117,7 @@ export const postCreate = async (
     } else {
       next(err);
     }
-  }
+  };
 };
 
 
@@ -101,5 +145,5 @@ export const listPost = async (
     } else {
       next(err);
     }
-  }
-}
+  };
+};
