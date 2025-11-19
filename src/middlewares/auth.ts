@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../services/jwtServices";
-import { JwtPayload as JwtPayloadLib } from "jsonwebtoken"; // renomme l'import
 
 interface MyJwtPayload {
   userId: string;
@@ -17,18 +16,22 @@ export async function authMiddleware(
 ) {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) return res.sendStatus(401);
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Token missing" });
+    }
 
     const token = authHeader.replace("Bearer ", "");
-    const decoded = (await verifyToken(token)) as unknown as JwtPayloadLib;
 
-    if (!decoded || typeof (decoded as any).userId !== "string") {
-      return res.sendStatus(401);
+    const decoded = await verifyToken(token);
+
+    if (!decoded || typeof decoded !== "object" || !("userId" in decoded)) {
+      return res.status(401).json({ message: "Token invalide" });
     }
 
     req.user = { userId: (decoded as any).userId };
     next();
-  } catch {
-    return res.sendStatus(401);
+
+  } catch (err) {
+    return res.status(401).json({ message: "Token invalide" });
   }
 }

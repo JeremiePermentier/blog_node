@@ -6,6 +6,7 @@ export interface IPostBase {
   content: string;
   coverImage: string;
   author: mongoose.Schema.Types.ObjectId,
+  comments: [mongoose.Schema.Types.ObjectId],
   published: Boolean,
   publishedAt: Date
 }

@@ -32,8 +32,12 @@ export const login = async (
       token,
     });
 
-  } catch (err) {
-    next(err);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+
+    return res.status(500).json({ success: false, message: "Unknown error" });
   }
 };
 
@@ -71,17 +75,21 @@ export const register = async (
       data: user,
     });
 
-  } catch (err: any) {
-    if (err.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: "Email already exists",
-      });
-    }
+  } catch (err: unknown) {
+    if (typeof err === "object" && err !== null) {
+      const errorObj = err as { [key: string]: any };
 
-    if (err.name === "ValidationError") {
-      const errors = Object.values(err.errors).map((e: any) => e.message);
-      return res.status(400).json({ success: false, errors });
+      if (errorObj.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already exists",
+        });
+      }
+
+      if (errorObj.name === "ValidationError" && errorObj.errors) {
+        const errors = Object.values(errorObj.errors).map((e: any) => e.message);
+        return res.status(400).json({ success: false, errors });
+      }
     }
 
     next(err);

@@ -8,6 +8,7 @@ const postSchema = new Schema<IPost>({
     slug: { type: String, required: true, trim: true, unique:true, lowercase: true },
     content: { type: String, required: true, trim: true },
     coverImage: { type: String, required: true },
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
     author: { type: String, required: true, trim: true },
     published: { type: Boolean, default: false, required: true },
     publishedAt: { type: Date, required: true}
