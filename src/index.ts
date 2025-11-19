@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import path from 'path';
 import index from './routes';
 import cors from 'cors';
+import { setupSwagger } from './swagger';
 require('./config/db');
 
 const app: express.Application = express();
@@ -15,4 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(index);
 
-app.listen(port);
+// ⚡ Initialisation Swagger
+setupSwagger(app);
+
+app.listen(port, () => {
+  console.log(`Serveur démarré sur http://localhost:${port}`);
+  console.log(`Swagger UI disponible sur http://localhost:${port}/api-docs`);
+});
