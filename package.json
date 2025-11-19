@@ -20,15 +20,20 @@
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "jose": "^6.1.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
     "morgan": "^1.10.1",
-    "passport": "^0.7.0"
+    "passport": "^0.7.0",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.9.2",
+    "@types/zxcvbn": "^4.4.5",
     "cross-env": "^10.1.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",

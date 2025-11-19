@@ -1,41 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
 import Post from '../models/post.model';
 import { IPostRequest } from '../types/post.types';
-import { ObjectId } from 'mongoose';
+import { Types } from "mongoose";
 
 export const postDelete = async (
-  req: Request<{ id: ObjectId}, {}, IPostRequest>,
+  req: Request<{ id: string }, {}, IPostRequest>,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<Response | void> => {
   try {
     const { id } = req.params;
-    const deletePost = await Post.findByIdAndDelete(id);
+
+    if (!id) {
+      return res.status(400).json({ success: false, message: "ID manquant." });
+    }
+
+    const objectId = new Types.ObjectId(id);
+
+    const deletePost = await Post.findByIdAndDelete(objectId);
 
     if (!deletePost) {
-      res.status(404).json({
-        success: false,
-        message: "Post non trouvé."
-      });
-      return;
+      return res.status(404).json({ success: false, message: "Post non trouvé." });
     }
 
-    res.status(201).json({
-      success: true
-    });
+    res.status(200).json({ success: true });
   } catch (err: any) {
-    if (err.name === 'ValidationError') {
-      const errors = Object.keys(err.errors).map(
-        (key) => err.errors[key].message
-      );
-      res.status(400).json({
-        success: false,
-        errors,
-      });
-    } else {
-      next(err);
+    if (err.name === "ValidationError") {
+      const errors = Object.keys(err.errors).map((key) => err.errors[key].message);
+      return res.status(400).json({ success: false, errors });
     }
-  };
+    next(err);
+  }
 };
 
 export const postEdit = async (
