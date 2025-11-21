@@ -15,17 +15,17 @@ const options: swaggerJsdoc.Options = {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          bearerFormat: 'JWT', // indique que c'est un JWT
+          bearerFormat: 'JWT',
         },
       },
     },
     security: [
       {
-        bearerAuth: [], // applique par défaut à toutes les routes (optionnel)
+        bearerAuth: [],
       },
     ],
   },
-  apis: ['./src/routes/*.ts'], // chemins vers tes fichiers de routes
+  apis: ['./src/routes/*.ts'],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

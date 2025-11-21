@@ -3,12 +3,14 @@ import { postCreate, listPost, postEdit, postDelete, getPost } from '../controll
 import { login, register } from '../controllers/login.controller';
 import { authMiddleware } from '../middlewares/auth';
 import { commentCreate, commentEdit, commentDelete } from '../controllers/comment.controller';
+import { categoryCreate, categoryDelete, categoryEdit, listCategory } from '../controllers/category.controller';
+import { listTag, tagCreate, tagDelete, tagEdit } from '../controllers/tag.controller';
 
 const router = Router();
 
 /**
  * @swagger
- * /api/post/new:
+ * /api/v1/v1/post/new:
  *   post:
  *     summary: Créer un nouveau post
  *     tags: [Post]
@@ -31,11 +33,11 @@ const router = Router();
  *       200:
  *         description: Post créé avec succès
  */
-router.post('/api/post/new', authMiddleware, postCreate);
+router.post('/api/v1/post/new', authMiddleware, postCreate);
 
 /**
  * @swagger
- * /api/post/edit/{id}:
+ * /api/v1/post/edit/{id}:
  *   patch:
  *     summary: Modifier un post
  *     tags: [Post]
@@ -65,11 +67,11 @@ router.post('/api/post/new', authMiddleware, postCreate);
  *       200:
  *         description: Post modifié
  */
-router.patch('/api/post/edit/:id', authMiddleware, postEdit);
+router.patch('/api/v1/post/edit/:id', authMiddleware, postEdit);
 
 /**
  * @swagger
- * /api/post/delete/{id}:
+ * /api/v1/post/delete/{id}:
  *   delete:
  *     summary: Supprimer un post
  *     tags: [Post]
@@ -86,11 +88,11 @@ router.patch('/api/post/edit/:id', authMiddleware, postEdit);
  *       200:
  *         description: Post supprimé
  */
-router.delete('/api/post/delete/:id', authMiddleware, postDelete);
+router.delete('/api/v1/post/delete/:id', authMiddleware, postDelete);
 
 /**
  * @swagger
- * /api/posts:
+ * /api/v1/posts:
  *   get:
  *     summary: Lister tous les posts
  *     tags: [Post]
@@ -100,11 +102,11 @@ router.delete('/api/post/delete/:id', authMiddleware, postDelete);
  *       200:
  *         description: Liste des posts
  */
-router.get('/api/posts', authMiddleware, listPost);
+router.get('/api/v1/posts', authMiddleware, listPost);
 
 /**
  * @swagger
- * /api/post/{id}:
+ * /api/v1/post/{id}:
  *   get:
  *     summary: Récupérer un post par son ID
  *     tags: [Post]
@@ -120,11 +122,11 @@ router.get('/api/posts', authMiddleware, listPost);
  *       200:
  *         description: Post récupéré
  */
-router.get('/api/post/:id', authMiddleware, getPost);
+router.get('/api/v1/post/:id', authMiddleware, getPost);
 
 /**
  * @swagger
- * /api/users/login:
+ * /api/v1/users/login:
  *   post:
  *     summary: Connexion utilisateur
  *     tags: [User]
@@ -145,11 +147,11 @@ router.get('/api/post/:id', authMiddleware, getPost);
  *       200:
  *         description: Utilisateur connecté
  */
-router.post('/api/users/login', login);
+router.post('/api/v1/users/login', login);
 
 /**
  * @swagger
- * /api/users/register:
+ * /api/v1/users/register:
  *   post:
  *     summary: Enregistrement d'un nouvel utilisateur
  *     tags: [User]
@@ -173,11 +175,11 @@ router.post('/api/users/login', login);
  *       200:
  *         description: Utilisateur créé
  */
-router.post('/api/users/register', register);
+router.post('/api/v1/users/register', register);
 
 /**
  * @swagger
- * /api/comment/new:
+ * /api/v1/comment/new:
  *   post:
  *     summary: Ajouter un commentaire
  *     tags: [Comment]
@@ -200,11 +202,11 @@ router.post('/api/users/register', register);
  *       200:
  *         description: Commentaire créé
  */
-router.post('/api/comment/new', authMiddleware, commentCreate);
+router.post('/api/v1/comment/new', authMiddleware, commentCreate);
 
 /**
  * @swagger
- * /api/comment/edit/{id}:
+ * /api/v1/comment/edit/{id}:
  *   patch:
  *     summary: Modifier un commentaire
  *     tags: [Comment]
@@ -231,11 +233,11 @@ router.post('/api/comment/new', authMiddleware, commentCreate);
  *       200:
  *         description: Commentaire modifié
  */
-router.patch('/api/comment/edit/:id', authMiddleware, commentEdit);
+router.patch('/api/v1/comment/edit/:id', authMiddleware, commentEdit);
 
 /**
  * @swagger
- * /api/comment/delete/{id}:
+ * /api/v1/comment/delete/{id}:
  *   delete:
  *     summary: Supprimer un commentaire
  *     tags: [Comment]
@@ -251,6 +253,180 @@ router.patch('/api/comment/edit/:id', authMiddleware, commentEdit);
  *       200:
  *         description: Commentaire supprimé
  */
-router.delete('/api/comment/delete/:id', authMiddleware, commentDelete);
+router.delete('/api/v1/comment/delete/:id', authMiddleware, commentDelete);
+
+/**
+ * @swagger
+ * /api/v1/category/new:
+ *   post:
+ *     summary: Créer une nouvelle catégorie
+ *     tags: [Category]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Technologie"
+ *     responses:
+ *       201:
+ *         description: Catégorie créée
+ */
+router.post('/api/v1/category/new', authMiddleware, categoryCreate);
+/**
+ * @swagger
+ * /api/v1/category/edit/{id}:
+ *   patch:
+ *     summary: Modifier une catégorie
+ *     tags: [Category]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la catégorie
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Nouvelle Technologie"
+ *     responses:
+ *       200:
+ *         description: Catégorie modifiée
+ */
+router.patch('/api/v1/category/edit/:id', authMiddleware, categoryEdit);
+/**
+ * @swagger
+ * /api/v1/category/delete/{id}:
+ *   delete:
+ *     summary: Supprimer une catégorie
+ *     tags: [Category]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la catégorie
+ *     responses:
+ *       200:
+ *         description: Catégorie supprimée
+ */
+router.delete('/api/v1/category/delete/:id', authMiddleware, categoryDelete);
+/**
+ * @swagger
+ * /api/v1/category:
+ *   get:
+ *     summary: Lister toutes les catégories
+ *     tags: [Category]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des catégories
+ */
+router.get('/api/v1/category', authMiddleware, listCategory);
+
+/**
+ * @swagger
+ * /api/v1/tag/new:
+ *   post:
+ *     summary: Créer un nouveau tag
+ *     tags: [Tag]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "React"
+ *     responses:
+ *       201:
+ *         description: Tag créé
+ */
+router.post('/api/v1/tag/new', authMiddleware, tagCreate);
+/**
+ * @swagger
+ * /api/v1/tag/edit/{id}:
+ *   patch:
+ *     summary: Modifier un tag
+ *     tags: [Tag]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du tag
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "VueJS"
+ *     responses:
+ *       200:
+ *         description: Tag modifié
+ */
+router.patch('/api/v1/tag/edit/:id', authMiddleware, tagEdit);
+/**
+ * @swagger
+ * /api/v1/tag/delete/{id}:
+ *   delete:
+ *     summary: Supprimer un tag
+ *     tags: [Tag]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du tag
+ *     responses:
+ *       200:
+ *         description: Tag supprimé
+ */
+router.delete('/api/v1/tag/delete/:id', authMiddleware, tagDelete);
+/**
+ * @swagger
+ * /api/v1/tag:
+ *   get:
+ *     summary: Lister tous les tags
+ *     tags: [Tag]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des tags
+ */
+router.get('/api/v1/tag', authMiddleware, listTag);
 
 export default router;
