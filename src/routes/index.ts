@@ -5,12 +5,42 @@ import { authMiddleware } from '../middlewares/auth';
 import { commentCreate, commentEdit, commentDelete } from '../controllers/comment.controller';
 import { categoryCreate, categoryDelete, categoryEdit, listCategory } from '../controllers/category.controller';
 import { listTag, tagCreate, tagDelete, tagEdit } from '../controllers/tag.controller';
+import multer from '../middlewares/multer-config';
 
 const router = Router();
 
 /**
  * @swagger
- * /api/v1/v1/post/new:
+ * tags:
+ *   - name: Post
+ *     description: Gestion des articles
+ *   - name: User
+ *     description: Gestion des utilisateurs
+ *   - name: Comment
+ *     description: Gestion des commentaires
+ *   - name: Category
+ *     description: Gestion des catégories
+ *   - name: Tag
+ *     description: Gestion des tags
+ */
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+/* ============================================================
+ *                        POST ROUTES
+ * ============================================================ */
+
+/**
+ * @swagger
+ * /api/v1/post/new:
  *   post:
  *     summary: Créer un nouveau post
  *     tags: [Post]
@@ -22,18 +52,17 @@ const router = Router();
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [title, content]
  *             properties:
  *               title:
  *                 type: string
- *                 example: "Mon premier post"
  *               content:
  *                 type: string
- *                 example: "Ceci est le contenu de mon post"
  *     responses:
- *       200:
+ *       201:
  *         description: Post créé avec succès
  */
-router.post('/api/v1/post/new', authMiddleware, postCreate);
+router.post('/api/v1/post/new', authMiddleware, multer, postCreate);
 
 /**
  * @swagger
@@ -44,12 +73,12 @@ router.post('/api/v1/post/new', authMiddleware, postCreate);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
  *           type: string
- *         description: Identifiant du post
+ *         description: ID du post
  *     requestBody:
  *       required: true
  *       content:
@@ -59,15 +88,13 @@ router.post('/api/v1/post/new', authMiddleware, postCreate);
  *             properties:
  *               title:
  *                 type: string
- *                 example: "Nouveau titre"
  *               content:
  *                 type: string
- *                 example: "Contenu modifié"
  *     responses:
  *       200:
  *         description: Post modifié
  */
-router.patch('/api/v1/post/edit/:id', authMiddleware, postEdit);
+router.patch('/api/v1/post/edit/:id', authMiddleware, multer, postEdit);
 
 /**
  * @swagger
@@ -78,17 +105,17 @@ router.patch('/api/v1/post/edit/:id', authMiddleware, postEdit);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - name: id
+ *         in: path
  *         schema:
  *           type: string
- *         description: Identifiant du post
+ *         required: true
+ *         description: ID du post
  *     responses:
  *       200:
  *         description: Post supprimé
  */
-router.delete('/api/v1/post/delete/:id', authMiddleware, postDelete);
+router.delete('/api/v1/post/delete/:id', authMiddleware, multer, postDelete);
 
 /**
  * @swagger
@@ -102,19 +129,19 @@ router.delete('/api/v1/post/delete/:id', authMiddleware, postDelete);
  *       200:
  *         description: Liste des posts
  */
-router.get('/api/v1/posts', authMiddleware, listPost);
+router.get('/api/v1/posts', authMiddleware, multer, listPost);
 
 /**
  * @swagger
  * /api/v1/post/{id}:
  *   get:
- *     summary: Récupérer un post par son ID
+ *     summary: Récupérer un post par ID
  *     tags: [Post]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
  *           type: string
@@ -122,7 +149,12 @@ router.get('/api/v1/posts', authMiddleware, listPost);
  *       200:
  *         description: Post récupéré
  */
-router.get('/api/v1/post/:id', authMiddleware, getPost);
+router.get('/api/v1/post/:id', authMiddleware, multer, getPost);
+
+
+/* ============================================================
+ *                        USER ROUTES
+ * ============================================================ */
 
 /**
  * @swagger
@@ -136,16 +168,15 @@ router.get('/api/v1/post/:id', authMiddleware, getPost);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [email, password]
  *             properties:
  *               email:
  *                 type: string
- *                 example: "user@test.com"
  *               password:
  *                 type: string
- *                 example: "monmotdepasse"
  *     responses:
  *       200:
- *         description: Utilisateur connecté
+ *         description: Connexion réussie
  */
 router.post('/api/v1/users/login', login);
 
@@ -161,21 +192,24 @@ router.post('/api/v1/users/login', login);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [username, email, password]
  *             properties:
  *               username:
  *                 type: string
- *                 example: "John Doe"
  *               email:
  *                 type: string
- *                 example: "john@test.com"
  *               password:
  *                 type: string
- *                 example: "monmotdepasse"
  *     responses:
- *       200:
+ *       201:
  *         description: Utilisateur créé
  */
 router.post('/api/v1/users/register', register);
+
+
+/* ============================================================
+ *                    COMMENT ROUTES
+ * ============================================================ */
 
 /**
  * @swagger
@@ -191,15 +225,14 @@ router.post('/api/v1/users/register', register);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [postId, content]
  *             properties:
  *               postId:
  *                 type: string
- *                 example: "645dd45aa2b3e"
  *               content:
  *                 type: string
- *                 example: "Ceci est un commentaire"
  *     responses:
- *       200:
+ *       201:
  *         description: Commentaire créé
  */
 router.post('/api/v1/comment/new', authMiddleware, commentCreate);
@@ -213,22 +246,21 @@ router.post('/api/v1/comment/new', authMiddleware, commentCreate);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - name: id
+ *         in: path
  *         schema:
  *           type: string
- *         description: ID du commentaire
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [content]
  *             properties:
  *               content:
  *                 type: string
- *                 example: "Commentaire mis à jour"
  *     responses:
  *       200:
  *         description: Commentaire modifié
@@ -244,8 +276,8 @@ router.patch('/api/v1/comment/edit/:id', authMiddleware, commentEdit);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
  *           type: string
@@ -255,11 +287,16 @@ router.patch('/api/v1/comment/edit/:id', authMiddleware, commentEdit);
  */
 router.delete('/api/v1/comment/delete/:id', authMiddleware, commentDelete);
 
+
+/* ============================================================
+ *                    CATEGORY ROUTES
+ * ============================================================ */
+
 /**
  * @swagger
  * /api/v1/category/new:
  *   post:
- *     summary: Créer une nouvelle catégorie
+ *     summary: Créer une catégorie
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
@@ -269,15 +306,16 @@ router.delete('/api/v1/comment/delete/:id', authMiddleware, commentDelete);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [name]
  *             properties:
  *               name:
  *                 type: string
- *                 example: "Technologie"
  *     responses:
  *       201:
  *         description: Catégorie créée
  */
 router.post('/api/v1/category/new', authMiddleware, categoryCreate);
+
 /**
  * @swagger
  * /api/v1/category/edit/{id}:
@@ -287,27 +325,27 @@ router.post('/api/v1/category/new', authMiddleware, categoryCreate);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - name: id
+ *         in: path
  *         schema:
  *           type: string
- *         description: ID de la catégorie
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [name]
  *             properties:
  *               name:
  *                 type: string
- *                 example: "Nouvelle Technologie"
  *     responses:
  *       200:
  *         description: Catégorie modifiée
  */
 router.patch('/api/v1/category/edit/:id', authMiddleware, categoryEdit);
+
 /**
  * @swagger
  * /api/v1/category/delete/{id}:
@@ -317,22 +355,22 @@ router.patch('/api/v1/category/edit/:id', authMiddleware, categoryEdit);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - name: id
+ *         in: path
  *         schema:
  *           type: string
- *         description: ID de la catégorie
+ *         required: true
  *     responses:
  *       200:
  *         description: Catégorie supprimée
  */
 router.delete('/api/v1/category/delete/:id', authMiddleware, categoryDelete);
+
 /**
  * @swagger
  * /api/v1/category:
  *   get:
- *     summary: Lister toutes les catégories
+ *     summary: Liste des catégories
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
@@ -342,11 +380,16 @@ router.delete('/api/v1/category/delete/:id', authMiddleware, categoryDelete);
  */
 router.get('/api/v1/category', authMiddleware, listCategory);
 
+
+/* ============================================================
+ *                      TAG ROUTES
+ * ============================================================ */
+
 /**
  * @swagger
  * /api/v1/tag/new:
  *   post:
- *     summary: Créer un nouveau tag
+ *     summary: Créer un tag
  *     tags: [Tag]
  *     security:
  *       - bearerAuth: []
@@ -356,15 +399,16 @@ router.get('/api/v1/category', authMiddleware, listCategory);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [name]
  *             properties:
  *               name:
  *                 type: string
- *                 example: "React"
  *     responses:
  *       201:
  *         description: Tag créé
  */
 router.post('/api/v1/tag/new', authMiddleware, tagCreate);
+
 /**
  * @swagger
  * /api/v1/tag/edit/{id}:
@@ -374,27 +418,27 @@ router.post('/api/v1/tag/new', authMiddleware, tagCreate);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - name: id
+ *         in: path
  *         schema:
  *           type: string
- *         description: ID du tag
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [name]
  *             properties:
  *               name:
  *                 type: string
- *                 example: "VueJS"
  *     responses:
  *       200:
  *         description: Tag modifié
  */
 router.patch('/api/v1/tag/edit/:id', authMiddleware, tagEdit);
+
 /**
  * @swagger
  * /api/v1/tag/delete/{id}:
@@ -404,17 +448,17 @@ router.patch('/api/v1/tag/edit/:id', authMiddleware, tagEdit);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
+ *       - name: id
+ *         in: path
  *         schema:
  *           type: string
- *         description: ID du tag
+ *         required: true
  *     responses:
  *       200:
  *         description: Tag supprimé
  */
 router.delete('/api/v1/tag/delete/:id', authMiddleware, tagDelete);
+
 /**
  * @swagger
  * /api/v1/tag:

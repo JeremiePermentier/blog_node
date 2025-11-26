@@ -93,6 +93,11 @@ export const postCreate = async (
     } else {
       body.slug = body.title;
     }
+
+    if (req.file) {
+      body.coverImage = `${req.protocol}://${req.get('host')}/img/${req.file.filename}`;
+    }
+    
     const post = new Post(body);
     const savedPost = await post.save();
 
