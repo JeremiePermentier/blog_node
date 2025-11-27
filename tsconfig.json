@@ -7,7 +7,7 @@
     "moduleResolution": "nodenext",
     "target": "es2020",
     "lib": ["esnext"],
-    "types": ["node"],
+    "types": ["node", "jest"],
 
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
