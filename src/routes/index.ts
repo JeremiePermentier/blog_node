@@ -129,7 +129,7 @@ router.delete('/api/v1/post/delete/:id', authMiddleware, multer, postDelete);
  *       200:
  *         description: Liste des posts
  */
-router.get('/api/v1/posts', authMiddleware, multer, listPost);
+router.get('/api/v1/posts', multer, listPost);
 
 /**
  * @swagger

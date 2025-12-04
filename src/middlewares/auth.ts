@@ -11,24 +11,26 @@ interface AuthRequest extends Request {
 
 export async function authMiddleware(
   req: AuthRequest,
-  res: Response, 
+  res: Response,
   next: NextFunction
 ) {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Token missing" });
+    if (!req.cookies) {
+      return res.status(400).json({ message: "Cookies missing" });
     }
 
-    const token = authHeader.replace("Bearer ", "");
-
-    const decoded = await verifyToken(token);
-
-    if (!decoded || typeof decoded !== "object" || !("userId" in decoded)) {
-      return res.status(401).json({ message: "Token invalide" });
+    const token = req.cookies.access_token;
+    if (!token) {
+      return res.status(401).json({ message: "No access_token cookie found" });
     }
 
-    req.user = { userId: (decoded as any).userId };
+    const decoded = await verifyToken<MyJwtPayload>(token);
+
+    if (!decoded || !decoded.userId) {
+      return res.status(401).json({ message: "Invalid token payload" });
+    }
+
+    req.user = { userId: decoded.userId };
     next();
 
   } catch (err) {

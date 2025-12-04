@@ -23,20 +23,30 @@ export const login = async (
       return res.status(401).json({ success: false, message: "Invalid password" });
     }
 
-    const token = await generateToken({ userId: user._id });
+    const accessToken = await generateToken(
+      { userId: user._id?.toString() },
+      "15m"
+    );
+
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 15 * 60 * 1000,
+    });
+
 
     return res.status(200).json({
+      success: true,
       id: user.id,
       username: user.username,
       email: user.email,
-      token,
     });
 
-  } catch (err: unknown) {
+  } catch (err) {
     if (err instanceof Error) {
       return res.status(500).json({ success: false, message: err.message });
     }
-
     return res.status(500).json({ success: false, message: "Unknown error" });
   }
 };
@@ -72,7 +82,11 @@ export const register = async (
 
     return res.status(201).json({
       success: true,
-      data: user,
+      data: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      },
     });
 
   } catch (err: unknown) {

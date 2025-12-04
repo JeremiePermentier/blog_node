@@ -4,8 +4,17 @@ import Comment from '../models/comment.model';
 import { IPostRequest } from '../types/post.types';
 import { Types } from "mongoose";
 
+interface MyJwtPayload {
+  userId: string;
+}
+
+interface AuthRequest<T = any> extends Request {
+  body: T;
+  user?: MyJwtPayload;
+}
+
 export const postDelete = async (
-  req: Request<{ id: string }, {}, IPostRequest>,
+  req: AuthRequest<{ id: string }>,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
@@ -80,23 +89,30 @@ export const postEdit = async (
 };
 
 export const postCreate = async (
-  req: Request<{}, {}, IPostRequest>,
+  req: any,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { body } = req;
+    const { body, user } = req;
+    console.log(user)
     const posts = await Post.find({ title: body.title }).exec();
 
-    if (posts) {
-      body.slug = body.title + posts.length;
+    if (posts.length > 0) {
+      body.slug = `${body.title}-${posts.length}`;
     } else {
       body.slug = body.title;
     }
+    console.log(body)
+    console.log(req.file)
 
     if (req.file) {
       body.coverImage = `${req.protocol}://${req.get('host')}/img/${req.file.filename}`;
     }
+
+    body.publishedAt = new Date();
+
+    body.author = req.user?.userId;
     
     const post = new Post(body);
     const savedPost = await post.save();

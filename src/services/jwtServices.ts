@@ -1,15 +1,18 @@
 import { JWTPayload, SignJWT, jwtVerify } from "jose";
 import { secret } from "../config/secret";
 
-export async function generateToken(payload: JWTPayload | undefined) {
+export async function generateToken(
+  payload: JWTPayload | undefined,
+  expiresIn: string = "2h"   // valeur par défaut = compatibilité
+) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("2h")
+    .setExpirationTime(expiresIn)
     .sign(secret);
 }
 
-export async function verifyToken(token: string | Uint8Array<ArrayBufferLike>) {
+export async function verifyToken<T>(token: string): Promise<T> {
   const { payload } = await jwtVerify(token, secret);
-  return payload;
+  return payload as T;
 }
