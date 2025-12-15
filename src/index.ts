@@ -11,7 +11,9 @@ const app: express.Application = express();
 const port: string = process.env.port || '3000';
 
 app.use(morgan('short'));
+app.use("/img", express.static(path.resolve("img")));
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({

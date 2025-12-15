@@ -9,7 +9,7 @@ const postSchema = new Schema<IPost>({
     content: { type: String, required: true, trim: true },
     coverImage: { type: String, required: true },
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-    author: { type: String, required: true, trim: true },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     published: { type: Boolean, default: false, required: true },
     publishedAt: { type: Date, required: true}
 });

@@ -142,21 +142,23 @@ export const listPost = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const skip = (page - 1) * limit;
-      const posts = await Post.find({})
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
 
-      res.status(200).json({
-        success: true,
-        data: posts,
-      });
+    const posts = await Post.find({})
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("author", "name email");
+
+    res.status(200).json({
+      success: true,
+      data: posts,
+    });
   } catch (err: any) {
-    if (err.name === 'ValidationError') {
+    if (err.name === "ValidationError") {
       const errors = Object.keys(err.errors).map(
         (key) => err.errors[key].message
       );
@@ -167,7 +169,7 @@ export const listPost = async (
     } else {
       next(err);
     }
-  };
+  }
 };
 
 export const getPost = async (

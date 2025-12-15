@@ -81,7 +81,8 @@ export const listCategory = async (
       const categories = await Category.find({})
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit);
+        .limit(limit)
+        .populate("author", "name email");
 
       res.status(200).json({
         success: true,

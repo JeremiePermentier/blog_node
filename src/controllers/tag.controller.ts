@@ -81,7 +81,8 @@ export const listTag = async (
       const tags = await Tag.find({})
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit);
+        .limit(limit)
+        .populate("author", "name email");
 
       res.status(200).json({
         success: true,

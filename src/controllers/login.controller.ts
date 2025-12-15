@@ -13,28 +13,37 @@ export const login = async (
   try {
     const { email, password } = req.body;
 
+    // Récupération de l'utilisateur
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+
+    // Hash factice pour empêcher les attaques par timing
+    const fakeHash = "$2b$10$abcdefghijklmnopqrstuv12345678901234567890123456";
+
+    // Compare toujours le mot de passe, même si l'utilisateur n'existe pas
+    const hashToCompare = user ? user.passwordHash : fakeHash;
+    const valid = await bcrypt.compare(password, hashToCompare);
+
+    // Message d’erreur générique (pas d’info sur l’existence du compte)
+    if (!user || !valid) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
-    const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) {
-      return res.status(401).json({ success: false, message: "Invalid password" });
-    }
-
+    // Génération du token
     const accessToken = await generateToken(
       { userId: user._id?.toString() },
       "15m"
     );
 
+    // Cookie sécurisé
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: "none",
       maxAge: 15 * 60 * 1000,
     });
-
 
     return res.status(200).json({
       success: true,
@@ -44,10 +53,12 @@ export const login = async (
     });
 
   } catch (err) {
-    if (err instanceof Error) {
-      return res.status(500).json({ success: false, message: err.message });
-    }
-    return res.status(500).json({ success: false, message: "Unknown error" });
+    // Erreur serveur
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return res.status(500).json({
+      success: false,
+      message,
+    });
   }
 };
 

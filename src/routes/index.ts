@@ -115,7 +115,7 @@ router.patch('/api/v1/post/edit/:id', authMiddleware, multer, postEdit);
  *       200:
  *         description: Post supprimé
  */
-router.delete('/api/v1/post/delete/:id', authMiddleware, multer, postDelete);
+router.delete('/api/v1/post/delete/:id', authMiddleware, postDelete);
 
 /**
  * @swagger
@@ -129,7 +129,7 @@ router.delete('/api/v1/post/delete/:id', authMiddleware, multer, postDelete);
  *       200:
  *         description: Liste des posts
  */
-router.get('/api/v1/posts', multer, listPost);
+router.get('/api/v1/posts', listPost);
 
 /**
  * @swagger
@@ -149,7 +149,7 @@ router.get('/api/v1/posts', multer, listPost);
  *       200:
  *         description: Post récupéré
  */
-router.get('/api/v1/post/:id', authMiddleware, multer, getPost);
+router.get('/api/v1/post/:id', authMiddleware, getPost);
 
 
 /* ============================================================

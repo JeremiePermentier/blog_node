@@ -6,7 +6,7 @@ export interface ICategory extends ICategoryBase, Document {}
 const categorySchema = new Schema<ICategory>({
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true },
-    author: { type: Schema.Types.ObjectId, ref: 'User' },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     createdAt: { type: Date, required: true},
     published: { type: Boolean, default: false, required: true },
     publishedAt: { type: Date, required: true},
