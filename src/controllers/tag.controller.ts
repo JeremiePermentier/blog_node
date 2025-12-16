@@ -4,12 +4,12 @@ import { ITagRequest } from '../types/tag.types';
 import { Types } from "mongoose";
 
 export const tagCreate = async (
-  req: Request<{ id: string }, {}, ITagRequest>,
+  req: any,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { body } = req;
+    const { body, user } = req;
     const tags = await Tag.find({ title: body.name }).exec();
 
     if (tags) {
@@ -17,6 +17,9 @@ export const tagCreate = async (
     } else {
       body.slug = body.name;
     }
+    body.createdAt = new Date();
+    body.publishedAt = new Date();
+    body.author = user?.userId;
     const tag = new Tag(body);
     const savedTag = await tag.save();
 

@@ -34,12 +34,12 @@ export const categoryDelete = async (
 };
 
 export const categoryCreate = async (
-  req: Request<{ id: string }, {}, ICategoryRequest>,
+  req: any,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { body } = req;
+    const { body, user } = req;
     const categories = await Category.find({ title: body.name }).exec();
 
     if (categories) {
@@ -47,6 +47,9 @@ export const categoryCreate = async (
     } else {
       body.slug = body.name;
     }
+    body.createdAt = new Date();
+    body.publishedAt = new Date();
+    body.author = user?.userId;
     const category = new Category(body);
     const savedCategory = await category.save();
 

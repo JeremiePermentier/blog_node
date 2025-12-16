@@ -103,8 +103,6 @@ export const postCreate = async (
     } else {
       body.slug = body.title;
     }
-    console.log(body)
-    console.log(req.file)
 
     if (req.file) {
       body.coverImage = `${req.protocol}://${req.get('host')}/img/${req.file.filename}`;
@@ -112,7 +110,7 @@ export const postCreate = async (
 
     body.publishedAt = new Date();
 
-    body.author = req.user?.userId;
+    body.author = user?.userId;
     
     const post = new Post(body);
     const savedPost = await post.save();
