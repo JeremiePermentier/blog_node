@@ -103,3 +103,31 @@ export const commentDelete = async (
     next(err);
   }
 };
+
+export const getComment = async (
+  req: Request<{ id: string }, {}, ICommentRequest>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const comment = await Comment.findById(id);
+
+    res.status(200).json({
+      success: true,
+      comment
+    });
+  } catch (err: any) {
+      if (err.name === 'ValidationError') {
+        const errors = Object.keys(err.errors).map(
+          (key) => err.errors[key].message
+        );
+        res.status(400).json({
+          success: false,
+          errors,
+        });
+      } else {
+        next(err);
+      }
+  };
+};

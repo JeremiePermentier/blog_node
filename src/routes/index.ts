@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { postCreate, listPost, postEdit, postDelete, getPost } from '../controllers/post.controller';
 import { login, register } from '../controllers/login.controller';
 import { authMiddleware } from '../middlewares/auth';
-import { commentCreate, commentEdit, commentDelete } from '../controllers/comment.controller';
-import { categoryCreate, categoryDelete, categoryEdit, listCategory } from '../controllers/category.controller';
-import { listTag, tagCreate, tagDelete, tagEdit } from '../controllers/tag.controller';
+import { commentCreate, commentEdit, commentDelete, getComment } from '../controllers/comment.controller';
+import { categoryCreate, categoryDelete, categoryEdit, getCategory, listCategory } from '../controllers/category.controller';
+import { getTag, listTag, tagCreate, tagDelete, tagEdit } from '../controllers/tag.controller';
 import multer from '../middlewares/multer-config';
 
 const router = Router();
@@ -287,6 +287,26 @@ router.patch('/api/v1/comment/edit/:id', authMiddleware, commentEdit);
  */
 router.delete('/api/v1/comment/delete/:id', authMiddleware, commentDelete);
 
+/**
+ * @swagger
+ * /api/v1/comment/{id}:
+ *   get:
+ *     summary: Récupérer un comment par ID
+ *     tags: [Comment]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Comment récupéré
+ */
+router.get('/api/v1/post/:id', authMiddleware, getComment);
+
 
 /* ============================================================
  *                    CATEGORY ROUTES
@@ -380,6 +400,26 @@ router.delete('/api/v1/category/delete/:id', authMiddleware, categoryDelete);
  */
 router.get('/api/v1/category', authMiddleware, listCategory);
 
+/**
+ * @swagger
+ * /api/v1/category/{id}:
+ *   get:
+ *     summary: Récupérer une category par ID
+ *     tags: [Category]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Category récupéré
+ */
+router.get('/api/v1/category/:id', authMiddleware, getCategory);
+
 
 /* ============================================================
  *                      TAG ROUTES
@@ -472,5 +512,25 @@ router.delete('/api/v1/tag/delete/:id', authMiddleware, tagDelete);
  *         description: Liste des tags
  */
 router.get('/api/v1/tag', authMiddleware, listTag);
+
+/**
+ * @swagger
+ * /api/v1/tag/{id}:
+ *   get:
+ *     summary: Récupérer un tag par ID
+ *     tags: [Post]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Tag récupéré
+ */
+router.get('/api/v1/tag/:id', authMiddleware, getTag);
 
 export default router;

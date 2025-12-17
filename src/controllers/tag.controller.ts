@@ -150,3 +150,31 @@ export const tagEdit = async (
     }
   };
 };
+
+export const getTag = async (
+  req: Request<{ id: string }, {}, ITagRequest>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const tag = await Tag.findById(id);
+
+    res.status(200).json({
+      success: true,
+      tag
+    });
+  } catch (err: any) {
+      if (err.name === 'ValidationError') {
+        const errors = Object.keys(err.errors).map(
+          (key) => err.errors[key].message
+        );
+        res.status(400).json({
+          success: false,
+          errors,
+        });
+      } else {
+        next(err);
+      }
+  };
+};

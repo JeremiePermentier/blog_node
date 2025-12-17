@@ -150,3 +150,31 @@ export const categoryEdit = async (
     }
   };
 };
+
+export const getCategory = async (
+  req: Request<{ id: string }, {}, ICategoryRequest>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const category = await Category.findById(id);
+
+    res.status(200).json({
+      success: true,
+      category
+    });
+  } catch (err: any) {
+      if (err.name === 'ValidationError') {
+        const errors = Object.keys(err.errors).map(
+          (key) => err.errors[key].message
+        );
+        res.status(400).json({
+          success: false,
+          errors,
+        });
+      } else {
+        next(err);
+      }
+  };
+};
