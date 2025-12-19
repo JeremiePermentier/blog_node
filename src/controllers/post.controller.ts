@@ -3,6 +3,7 @@ import Post from '../models/post.model';
 import Comment from '../models/comment.model';
 import { IPostRequest } from '../types/post.types';
 import { Types } from "mongoose";
+const fs = require('fs');
 
 interface MyJwtPayload {
   userId: string;
@@ -27,13 +28,23 @@ export const postDelete = async (
 
     const objectId = new Types.ObjectId(id);
 
-    const deletePost = await Post.findByIdAndDelete(objectId);
+    const post = await Post.findById(objectId);
 
-    if (!deletePost) {
+    if (!post) {
       return res.status(404).json({ success: false, message: "Post non trouvé." });
     }
 
-    res.status(200).json({ success: true });
+    const filePath = post.coverImage.split('img/')[1];
+    fs.unlink(`img/${filePath}`, () => {
+
+      Post.findByIdAndDelete(objectId)
+      .then(() => {
+        res.status(200).json({ success: true });
+      })
+      .catch((err: any) => {
+        res.status(500).json({ success: false, message: err.message });
+      });
+    });
   } catch (err: any) {
     if (err.name === "ValidationError") {
       const errors = Object.keys(err.errors).map((key) => err.errors[key].message);
@@ -51,6 +62,24 @@ export const postEdit = async (
   try {
     const { id } = req.params;
     const { body } = req;
+    const post = await Post.findById(id);
+
+    if (!post) {
+      res.status(404).json({
+        success: false,
+        message: "Post non trouvé."
+      });
+      return;
+    }
+
+    const filePath = post.coverImage.split('img/')[1];
+    fs.unlink(`img/${filePath}`, () => {
+      Post.findByIdAndDelete(id);
+    });
+
+    if (req.file) {
+      body.coverImage = `${req.protocol}://${req.get('host')}/img/${req.file.filename}`;
+    }
 
     const updatedPost = await Post.findByIdAndUpdate(
       id,
@@ -95,7 +124,6 @@ export const postCreate = async (
 ): Promise<void> => {
   try {
     const { body, user } = req;
-    console.log(user)
     const posts = await Post.find({ title: body.title }).exec();
 
     if (posts.length > 0) {

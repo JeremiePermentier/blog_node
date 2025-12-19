@@ -82,7 +82,7 @@ router.post('/api/v1/post/new', authMiddleware, multer, postCreate);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
