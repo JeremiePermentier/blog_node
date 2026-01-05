@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { generateToken } from '../services/jwtServices';
+import { generateRefreshToken, generateToken } from '../services/jwtServices';
 import User from '../models/user.models';
 import bcrypt from "bcrypt";
 import { IUserRequest } from '../types/user.types';
@@ -35,6 +35,11 @@ export const login = async (
     const accessToken = await generateToken(
       { userId: user._id?.toString() },
       "15m"
+    );
+
+    const refreshToken = await generateRefreshToken(
+      { userId: user._id?.toString() },
+      "7d"
     );
 
     // Cookie sécurisé

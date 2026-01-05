@@ -12,6 +12,17 @@ export async function generateToken(
     .sign(secret);
 }
 
+export async function generateRefreshToken(
+  payload: JWTPayload | undefined,
+  expiresIn: string = "7d"
+) {
+  return new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(expiresIn)
+    .sign(secret);
+}
+
 export async function verifyToken<T>(token: string): Promise<T> {
   const { payload } = await jwtVerify(token, secret);
   return payload as T;
